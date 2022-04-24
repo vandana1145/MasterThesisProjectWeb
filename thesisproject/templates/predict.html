@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block main %}
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Prediction Results</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h5>Prediction Input:</h5>
+                <div>Floor Number: <span id="fn"></span></div>
+                <div>Total Floor Area: <span id="fa"></span></div>
+                <div>Column Area: <span id="ca"></span></div>
+                <div>Concrete Wall AreaNS: <span id="cwns"></span></div>
+                <div>Concrete Wall AreaEW: <span id="cwew"></span></div>
+                <div>Masonry Wall AreaNS: <span id="mwns"></span></div>
+                <div>Masonry Wall AreaEW: <span id="mwew"></span></div>
+                <div>Captive Column: <span id="cc"></span></div>
+                <h5 class="pt-3">Prediction Classification:</h5>
+                <div id="prediction"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <a class="btn btn-primary" href="/results" role="button">View DB</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container pt-5">
+    <div class="row justify-content-md-center">
+        <div class="col-md-4">
+            <h1>Seismic Damage Prediction</h1>
+            <form action="" id="post-form">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="floor_num">Floor Number</label>
+                    <input type="number" step="1" class="form-control" id="floor_num" placeholder="" required>
+                </div>
+                <div class="form-group">
+                    <label for="floor_area">Total Floor Area</label>
+                    <input type="number" step="1" class="form-control" id="floor_area" placeholder="" required>
+                </div>
+                <div class="form-group">
+                    <label for="column_area">Column Area</label>
+                    <input type="number" step="0.1" class="form-control" id="column_area" placeholder="" required>
+                </div>
+                <div class="form-group">
+                    <label for="concrete_wall_areaNS">Concrete Wall AreaNS</label>
+                    <input type="number" step="0.1" class="form-control" id="concrete_wall_areaNS" placeholder="" required>
+                </div>
+                <div class="form-group">
+                    <label for="concrete_wall_areaEW">Concrete Wall AreaEW</label>
+                    <input required type="number" step="0.1" class="form-control" id="concrete_wall_areaEW" placeholder="" required>
+                </div>
+                <div class="form-group">
+                    <label for="masonry_wall_areaNS">Masonry Wall AreaNS</label>
+                    <input type="number" step="0.1" class="form-control" id="masonry_wall_areaNS" placeholder="" required>
+                </div>
+                <div class="form-group">
+                    <label for="masonry_wall_areaEW">Masonry Wall AreaEW</label>
+                    <input type="number" step="0.1" class="form-control" id="masonry_wall_areaEW" placeholder="" required>
+                </div>
+                <div class="form-group">
+                    <label for="captive_column">Captive Column</label>
+                    <input type="boolean" class="form-control" id="captive_column" placeholder="" required>
+                </div>
+                <button type="submit" value="Submit" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">Submit</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).on('submit', '#post-form',function(e){
+        e.preventDefault();
+        $.ajax({
+            type:'POST',
+            url:'{% url "predict:submit_prediction" %}',
+            data:{
+                floor_num:$('#floor_num').val(),
+                floor_area:$('#floor_area').val(),
+                column_area:$('#column_area').val(),
+                concrete_wall_areaNS:$('#concrete_wall_areaNS').val(),
+                concrete_wall_areaEW:$('#concrete_wall_areaEW').val(),
+                masonry_wall_areaNS:$('#masonry_wall_areaNS').val(),
+                masonry_wall_areaEW:$('#masonry_wall_areaEW').val(),
+                captive_column:$('#captive_column').val(),
+                csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+                action: 'post'
+            },
+            success:function(json) {
+                document.forms["post-form"].reset();
+                document.getElementById("prediction").innerHTML = json['result']
+                document.getElementById("fn").innerHTML = json['floor_num']
+                document.getElementById("fa").innerHTML = json['floor_area']
+                document.getElementById("ca").innerHTML = json['column_area']
+                document.getElementById("cwns").innerHTML = json['concrete_wall_areaNS']
+                document.getElementById("cwew").innerHTML = json['concrete_wall_areaEW']
+                document.getElementById("mwns").innerHTML = json['masonry_wall_areaNS']
+                document.getElementById("mwew").innerHTML = json['masonry_wall_areaEW']
+                document.getElementById("cc").innerHTML = json['captive_column']
+            },
+            error : function(xhr,errmsg,err) {
+
+            }
+        });
+    })
+</script>
+
+{% endblock %}
+

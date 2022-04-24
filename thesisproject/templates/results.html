@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block main %}
+    <div class="container pt-5">
+        <div class="row">
+
+        <h1>Prediction Results</h1>
+
+            <table class="table">
+                <thead>
+                <tr>
+                <th scope="col">#</th>
+                <th scope="col">Floor Number</th>
+                <th scope="col">Total Floor Area</th>
+                <th scope="col">Column Area</th>
+                <th scope="col">Concrete Wall AreaNS</th>
+                <th scope="col">Concrete Wall AreaEW</th>
+                <th scope="col">Masonry Wall AreaNS</th>
+                <th scope="col">Masonry Wall AreaEW</th>
+                <th scope="col">Captive Column</th>
+                <th scope="col">Prediction</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for data in dataset %}
+                    <tr>
+                    <th scope="row">{{ data.id }}</th>
+                    <td>{{ data.floor_num }}</td>
+                    <td>{{ data.floor_area }}</td>
+                    <td>{{ data.column_area }}</td>
+                    <td>{{ data.concrete_wall_areaNS }}</td>
+                    <td>{{ data.concrete_wall_areaEW }}</td>
+                    <td>{{ data.masonry_wall_areaNS }}</td>
+                    <td>{{ data.masonry_wall_areaEW }}</td>
+                    <td>{{ data.captive_column }}</td>
+                    <td>{{ data.classification }}</td>
+                    </tr>
+                {% endfor %}
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
